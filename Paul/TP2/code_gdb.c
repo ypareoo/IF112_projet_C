@@ -59,7 +59,7 @@ matrix mult_matrix(matrix mat1, matrix mat2) {
   for (int i=0; i<mat1.lines; i++) {
     for (int j=0; j<mat2.cols; j++) {
       for (int p=0; p<mat1.cols; p++)
-        mat3.ptr[j+i*mat2.cols] += mat1.ptr[i+p*mat1.cols]*mat2.ptr[j+p*mat2.cols];
+        mat3.ptr[j+i*mat2.cols] += mat1.ptr[p+i*mat1.cols]*mat2.ptr[j+p*mat2.cols];
     }
   }
   return mat3;
@@ -82,8 +82,8 @@ int main() {
   disp_matrix(mat3);
 
   //Product
-  matrix mat4 = new_matrix(3,500);  //3, 5
-  matrix mat5 = new_matrix(500,5);  //5, 5
+  matrix mat4 = new_matrix(3,50);  //3, 5
+  matrix mat5 = new_matrix(50,5);  //5, 5
   mat4 = fill_matrix(mat4);
   mat5 = fill_matrix(mat5);
   //disp_matrix(mat4);
