@@ -22,6 +22,20 @@ typedef struct {
     int * convrg;
 } mandel_pic;
 
+mandel_pic new_mandel(int width, int height, double Xmin, double Ymin, double scale){
+    mandel_pic retour;
+    retour.Xmax = Xmin + (scale*3.0);
+    retour.Ymax = Ymin + (scale*3.0*(height/width));
+    retour.pixwidth = scale*(3.0/width);
+
+    retour.width = width;
+    retour.height = height;
+    retour.Xmin = Xmin;
+    retour.Ymin = Ymin;
+    retour.scale = scale;
+    retour.convrg = (int*) malloc(sizeof(int)*width*height);
+}
+
 color palette(int c){
     color retour;
     int c_modulo = c;
