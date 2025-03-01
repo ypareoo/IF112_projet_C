@@ -1,5 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include "interpolate_to_debug.h"
+#include "convergence.h"
 
 typedef struct {
   int lines;
