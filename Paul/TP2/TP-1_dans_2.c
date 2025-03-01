@@ -207,14 +207,14 @@ void save_mandel(mandel_pic mandel,char* nom_fichier){
     fclose(fp);
 }
 
-mandel_pic create_struct_mandelbrot(int w, int h){
-    mandel_pic ma_structure_mandel = new_mandel(w,h,-0.755232,0.121387,0.01);
+mandel_pic create_struct_mandelbrot(int w, int h, double x_min, double y_min, double scale){
+    mandel_pic ma_structure_mandel = new_mandel(w,h,x_min,y_min,scale);
     float coordonnee_x;
     float coordonnee_y;
     for(int i=0;i<h;i++){
         for(int j=0;j<w;j++){
-            coordonnee_x = (3.0/899.0)* (float) j- (float) 2;
-            coordonnee_y = (-2.0/599.0)* (float) i + (float) 1;
+            coordonnee_x = ((float) scale)*(3.0/899.0)* (float) j - (float) x_min;
+            coordonnee_y = ((float) scale)*(-2.0/599.0)* (float) i + (float) y_min;
 
             ma_structure_mandel.convrg[j+i*w] = convergence(coordonnee_x,coordonnee_y);
         }
@@ -229,7 +229,7 @@ int main(){
     //create_disque(600,400,100);
     //printf("t: ça converge ? %d\n",convergence(-1,0.29));
     //create_image_mandelbrot(LARGEUR,HAUTEUR);
-    mandel_pic structure_mandel = create_struct_mandelbrot(LARGEUR,HAUTEUR);
+    mandel_pic structure_mandel = create_struct_mandelbrot(LARGEUR,HAUTEUR,-2,-1,1);
     save_mandel(structure_mandel,"mandelbrot_via_struct.ppm");
     free(structure_mandel.convrg);
     printf("t:FIN\n");
