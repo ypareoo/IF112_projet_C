@@ -21,6 +21,11 @@ struct picture new_pic(int width, int height){
     retour.width = width;
     retour.height = height;
     retour.pixels = (struct color*) malloc(sizeof(struct color)*width*height);
+    for (int i=0;i<width*height;i++){
+        retour.pixels[i].red = 0;
+        retour.pixels[i].green = 0;
+        retour.pixels[i].blue = 0;
+    }
     return retour;
 }
 
@@ -48,11 +53,12 @@ void set_pixel(struct picture pic,int x,int y,unsigned char rouge,unsigned char 
 }
 
 int main(){
-    struct picture ma_photo = new_pic(2,2);
+    struct picture ma_photo = new_pic(10,10);
     set_pixel(ma_photo,0,0,0,0,0);
     set_pixel(ma_photo,0,1,0,255,0);
     set_pixel(ma_photo,1,0,255,0,0);
     set_pixel(ma_photo,1,1,0,0,255);
     save_picture(ma_photo,"mon_image.ppm");
+    free(ma_photo.pixels);
     printf("t:FIN\n");
 }
