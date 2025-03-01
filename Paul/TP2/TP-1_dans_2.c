@@ -235,9 +235,11 @@ mandel_pic interpolation_mandelbrot(int w, int h, double x_min, double y_min, do
     float coordonnee_y;
     for(int i=0;i<h;i++){
         for(int j=0;j<w;j++){
-            interpolate(ma_structure_mandel,coordonnee_x,coordonnee_y);
+            coordonnee_x = ((float) scale)*(3.0/899.0)* (float) j + (float) x_min; //résonner sur le signe de x_min
+            coordonnee_y = ((float) scale)*(-2.0/599.0)* (float) i - (float) y_min;
+            
 
-            ma_structure_mandel.convrg[j+i*w] = convergence(coordonnee_x,coordonnee_y);
+            ma_structure_mandel.convrg[j+i*w] = interpolate(ma_structure_mandel,coordonnee_x,coordonnee_y);
         }
     }
     return ma_structure_mandel;
