@@ -26,7 +26,7 @@ typedef struct {
 
 int interpolate(mandel_pic old_pic, double x, double y) {
     //To force computation of new pixels
-    //if (random() < RAND_MAX*REFRESH_PROB)
+    //if (random() < RAND_MAX/100)
         //return -1;
     
     //Outside the previous image
@@ -35,14 +35,35 @@ int interpolate(mandel_pic old_pic, double x, double y) {
         return -1;
     if (x > old_pic.Xmax) 
         return -1;
-    if (y < old_pic.Ymin)//ça merde
+    if (y < old_pic.Ymin)
         return -1;
     if (y > old_pic.Ymax)
         return -1;
     
-    double val;
+    //double val;
+
+    double x_droite = old_pic.Xmin;
+    int w=0;
+    while (x > x_droite){
+        x_droite += (old_pic.Xmax - old_pic.Xmin)/(old_pic.width-1);
+        w+=1;
+    }
+
+    double y_haut = old_pic.Ymin;
+    int h=0;
+    while (y > y_haut){
+        y_haut += (old_pic.Ymax - old_pic.Ymin)/(old_pic.height-1);
+        h+=1;
+    }
+    //printf("t: y_haut %f y %f y_bas %f\n",y_haut,y, y_haut - 2*((old_pic.Ymax - old_pic.Ymin)/(old_pic.height-1)));
+
+    int meme_valeur = old_pic.convrg[w + h*old_pic.width];
+    if (meme_valeur != old_pic.convrg[w + (h-2)*old_pic.width] || meme_valeur != old_pic.convrg[w-2 + h*old_pic.width] || meme_valeur != old_pic.convrg[w-2 + (h-2)*old_pic.width])
+        return -1;
+    //printf("t:yo\n");
     double xindex, yindex;
     int xi, yi;
+
 
     //Projection of new coordinates in the old 
     xindex = (x - old_pic.Xmin)/old_pic.pixwidth; //Between 0-width
@@ -210,8 +231,13 @@ mandel_pic interpolation_mandelbrot(mandel_pic old_structure,int w, int h, doubl
             coordonnee_x = ((ma_structure_mandel.Xmax - x_min)/(w-1))* (float) j + (float) x_min; //résonner sur le signe de x_min
             coordonnee_y = ((ma_structure_mandel.Ymax - y_min)/(h-1))* (float) i + (float) y_min;
             
-
-            ma_structure_mandel.convrg[j+i*w] = interpolate(old_structure,coordonnee_x,coordonnee_y);
+            if (interpolate(old_structure,coordonnee_x,coordonnee_y) > -1){
+                ma_structure_mandel.convrg[j+i*w] = interpolate(old_structure,coordonnee_x,coordonnee_y);
+            }
+            else {
+                //printf("t:yo\n");
+                ma_structure_mandel.convrg[j+i*w] = convergence(coordonnee_x,coordonnee_y);
+            }
         }
     }
     return ma_structure_mandel;
@@ -224,7 +250,8 @@ int main(){
     //printf("t: ça converge ? %d\n",convergence(-1,0.29));
     create_image_mandelbrot(LARGEUR,HAUTEUR);
     mandel_pic structure_mandel = create_struct_mandelbrot(LARGEUR,HAUTEUR,-0.755232,0.121387,0.01);
-    mandel_pic struct_mandel_interpol = interpolation_mandelbrot(structure_mandel,LARGEUR,HAUTEUR,-0.752914,0.123475,0.00738);
+    //mandel_pic struct_mandel_interpol = interpolation_mandelbrot(structure_mandel,LARGEUR,HAUTEUR,-0.752914,0.123475,0.00738);
+    mandel_pic struct_mandel_interpol = interpolation_mandelbrot(structure_mandel,LARGEUR,HAUTEUR,-0.752914,0.123475,0.00138);
     //printf("%d \n",interpolate(structure_mandel,-0.755232,0.121387));
     save_mandel(structure_mandel,"mandelbrot_via_struct.ppm");
     save_mandel(struct_mandel_interpol,"mandelbrot_interpolation.ppm");
