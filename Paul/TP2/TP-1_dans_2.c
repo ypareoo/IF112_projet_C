@@ -61,7 +61,7 @@ int interpolate(mandel_pic old_pic, double x, double y) {
 mandel_pic new_mandel(int width, int height, double Xmin, double Ymin, double scale){
     mandel_pic retour;
     retour.Xmax = Xmin + (scale*3.0);
-    retour.Ymax = Ymin + (scale*3.0*(height/width));
+    retour.Ymax = Ymin + (scale*3.0*((float) height/(float)width)); // (float) nécessaire sinon la fraction renvoie zéro
     retour.pixwidth = scale*(3.0/width);
 
     retour.width = width;
@@ -124,36 +124,6 @@ color palette(int c){
     return retour;
 }
 
-// préciser l'ensemble des pixels
-void create_disque(int w, int h, int rayon){
-    char* filename = "dique.ppm";
-    FILE * fp = fopen(filename,"w");
-    fprintf(fp, "P6 %d %d 255 ",w,h); //bits qui stockent les caractéristiques du fichier
-    char r=255;
-    char g=255;
-    char b=255;
-
-    char r_bis=0;
-    char g_bis=0;
-    char b_bis=0;
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            float distance_centre = sqrt(pow(((h/2)-i),2)+pow((j-(w/2)),2));    //pow -> mise au carré ici
-            if (distance_centre <= 150){
-                fwrite(&r_bis,sizeof(char),1,fp);
-                fwrite(&g_bis,sizeof(char),1,fp);
-                fwrite(&b_bis,sizeof(char),1,fp);
-            }
-            else {
-                fwrite(&r,sizeof(char),1,fp);
-                fwrite(&g,sizeof(char),1,fp);
-                fwrite(&b,sizeof(char),1,fp);
-            }
-        }
-    }
-    fclose(fp);
-}
-
 int convergence(float x, float y){
     float u_x = x;
     float u_y = y;
@@ -180,8 +150,8 @@ void create_image_mandelbrot(int w, int h){
     float coordonnee_y;
     for(int i=0;i<h;i++){
         for(int j=0;j<w;j++){
-            coordonnee_x = (3.0/899.0)* (float) j- (float) 2;
-            coordonnee_y = (-2.0/599.0)* (float) i + (float) 1;
+            coordonnee_x = (3.0/(w-1))* (float) j- (float) 2;
+            coordonnee_y = (-2.0/(h-1))* (float) i + (float) 1;
 
             color couleur = palette(convergence(coordonnee_x,coordonnee_y)*15); // multiple de trois
 
@@ -219,27 +189,29 @@ mandel_pic create_struct_mandelbrot(int w, int h, double x_min, double y_min, do
     mandel_pic ma_structure_mandel = new_mandel(w,h,x_min,y_min,scale);
     float coordonnee_x;
     float coordonnee_y;
+    printf("t: %f\n",y_min);
+    printf("t: %f\n",ma_structure_mandel.Ymax);
     for(int i=0;i<h;i++){
         for(int j=0;j<w;j++){
-            coordonnee_x = ((float) scale)*(3.0/899.0)* (float) j + (float) x_min; //résonner sur le signe de x_min
-            coordonnee_y = ((float) scale)*(-2.0/599.0)* (float) i - (float) y_min;
+            coordonnee_x = ((float) (ma_structure_mandel.Xmax - x_min)/(w-1))* (float) j + (float) x_min; //résonner sur le signe de x_min
+            coordonnee_y = ((float) (y_min - ma_structure_mandel.Ymax)/(h-1))* (float) i - (float) y_min;
 
             ma_structure_mandel.convrg[j+i*w] = convergence(coordonnee_x,coordonnee_y);
         }
     }
     return ma_structure_mandel;
 }
-mandel_pic interpolation_mandelbrot(int w, int h, double x_min, double y_min, double scale){
+mandel_pic interpolation_mandelbrot(mandel_pic old_structure,int w, int h, double x_min, double y_min, double scale){
     mandel_pic ma_structure_mandel = new_mandel(w,h,x_min,y_min,scale);
     float coordonnee_x;
     float coordonnee_y;
     for(int i=0;i<h;i++){
         for(int j=0;j<w;j++){
-            coordonnee_x = ((float) scale)*(3.0/899.0)* (float) j + (float) x_min; //résonner sur le signe de x_min
-            coordonnee_y = ((float) scale)*(-2.0/599.0)* (float) i - (float) y_min;
+            coordonnee_x = ((ma_structure_mandel.Xmax - x_min)/(w-1))* (float) j + (float) x_min; //résonner sur le signe de x_min
+            coordonnee_y = ((y_min - ma_structure_mandel.Ymax)/(h-1))* (float) i - (float) y_min;
             
 
-            ma_structure_mandel.convrg[j+i*w] = interpolate(ma_structure_mandel,coordonnee_x,coordonnee_y);
+            ma_structure_mandel.convrg[j+i*w] = interpolate(old_structure,coordonnee_x,coordonnee_y);
         }
     }
     return ma_structure_mandel;
@@ -249,11 +221,10 @@ mandel_pic interpolation_mandelbrot(int w, int h, double x_min, double y_min, do
 
 int main(){
     //create_img(10,10);
-    //create_disque(600,400,100);
     //printf("t: ça converge ? %d\n",convergence(-1,0.29));
-    //create_image_mandelbrot(LARGEUR,HAUTEUR);
-    //mandel_pic structure_mandel = create_struct_mandelbrot(LARGEUR,HAUTEUR,-0.755232,0.121387,0.01);
-    mandel_pic structure_mandel = interpolation_mandelbrot(LARGEUR,HAUTEUR,-0.752914,0.123475,0.00738);
+    create_image_mandelbrot(LARGEUR,HAUTEUR);
+    mandel_pic structure_mandel = create_struct_mandelbrot(LARGEUR,HAUTEUR,-0.755232,0.121387,0.01);
+    //mandel_pic structure_mandel = interpolation_mandelbrot(LARGEUR,HAUTEUR,-0.752914,0.123475,0.00738);
     //printf("%d \n",interpolate(structure_mandel,-0.755232,0.121387));
     save_mandel(structure_mandel,"mandelbrot_via_struct.ppm");
     free(structure_mandel.convrg);
