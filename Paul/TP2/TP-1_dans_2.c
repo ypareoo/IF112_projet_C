@@ -31,11 +31,11 @@ int interpolate(mandel_pic old_pic, double x, double y) {
     
     //Outside the previous image
     //or equal, to avoid border effects in the 4 neighbors interpolation
-    if (x < old_pic.Xmin) 
+    if (x < old_pic.Xmin)
         return -1;
     if (x > old_pic.Xmax) 
         return -1;
-    if (y < old_pic.Ymin) 
+    if (y < old_pic.Ymin)//ça merde
         return -1;
     if (y > old_pic.Ymax)
         return -1;
@@ -49,6 +49,7 @@ int interpolate(mandel_pic old_pic, double x, double y) {
     yindex = (y - old_pic.Ymin)/old_pic.pixwidth; //Between 0-height
     xi = xindex;
     yi = yindex;
+    //printf("t: %d \n",xi);
 
     //For closest point,
     return old_pic.convrg[xi + old_pic.width*(yi)];
@@ -62,6 +63,7 @@ mandel_pic new_mandel(int width, int height, double Xmin, double Ymin, double sc
     mandel_pic retour;
     retour.Xmax = Xmin + (scale*3.0);
     retour.Ymax = Ymin + (scale*3.0*((float) height/(float)width)); // (float) nécessaire sinon la fraction renvoie zéro
+    //printf("t: %f\n", retour.Ymax);
     retour.pixwidth = scale*(3.0/width);
 
     retour.width = width;
@@ -151,7 +153,7 @@ void create_image_mandelbrot(int w, int h){
     for(int i=0;i<h;i++){
         for(int j=0;j<w;j++){
             coordonnee_x = (3.0/(w-1))* (float) j- (float) 2;
-            coordonnee_y = (-2.0/(h-1))* (float) i + (float) 1;
+            coordonnee_y = (2.0/(h-1))* (float) i - (float) 1;
 
             color couleur = palette(convergence(coordonnee_x,coordonnee_y)*15); // multiple de trois
 
@@ -189,12 +191,10 @@ mandel_pic create_struct_mandelbrot(int w, int h, double x_min, double y_min, do
     mandel_pic ma_structure_mandel = new_mandel(w,h,x_min,y_min,scale);
     float coordonnee_x;
     float coordonnee_y;
-    printf("t: %f\n",y_min);
-    printf("t: %f\n",ma_structure_mandel.Ymax);
     for(int i=0;i<h;i++){
         for(int j=0;j<w;j++){
             coordonnee_x = ((float) (ma_structure_mandel.Xmax - x_min)/(w-1))* (float) j + (float) x_min; //résonner sur le signe de x_min
-            coordonnee_y = ((float) (y_min - ma_structure_mandel.Ymax)/(h-1))* (float) i - (float) y_min;
+            coordonnee_y = ((float) (ma_structure_mandel.Ymax - y_min)/(h-1))* (float) i + (float) y_min;
 
             ma_structure_mandel.convrg[j+i*w] = convergence(coordonnee_x,coordonnee_y);
         }
@@ -208,7 +208,7 @@ mandel_pic interpolation_mandelbrot(mandel_pic old_structure,int w, int h, doubl
     for(int i=0;i<h;i++){
         for(int j=0;j<w;j++){
             coordonnee_x = ((ma_structure_mandel.Xmax - x_min)/(w-1))* (float) j + (float) x_min; //résonner sur le signe de x_min
-            coordonnee_y = ((y_min - ma_structure_mandel.Ymax)/(h-1))* (float) i - (float) y_min;
+            coordonnee_y = ((ma_structure_mandel.Ymax - y_min)/(h-1))* (float) i + (float) y_min;
             
 
             ma_structure_mandel.convrg[j+i*w] = interpolate(old_structure,coordonnee_x,coordonnee_y);
@@ -224,10 +224,12 @@ int main(){
     //printf("t: ça converge ? %d\n",convergence(-1,0.29));
     create_image_mandelbrot(LARGEUR,HAUTEUR);
     mandel_pic structure_mandel = create_struct_mandelbrot(LARGEUR,HAUTEUR,-0.755232,0.121387,0.01);
-    //mandel_pic structure_mandel = interpolation_mandelbrot(LARGEUR,HAUTEUR,-0.752914,0.123475,0.00738);
+    mandel_pic struct_mandel_interpol = interpolation_mandelbrot(structure_mandel,LARGEUR,HAUTEUR,-0.752914,0.123475,0.00738);
     //printf("%d \n",interpolate(structure_mandel,-0.755232,0.121387));
     save_mandel(structure_mandel,"mandelbrot_via_struct.ppm");
+    save_mandel(struct_mandel_interpol,"mandelbrot_interpolation.ppm");
     free(structure_mandel.convrg);
+    free(struct_mandel_interpol.convrg);
     printf("t:FIN\n");
 }
 
