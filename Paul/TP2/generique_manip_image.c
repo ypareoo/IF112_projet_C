@@ -47,9 +47,9 @@ void save_picture(struct picture pic,char* nom_fichier){
     fclose(fp);
 }
 void set_pixel(struct picture pic,int x,int y,unsigned char rouge,unsigned char vert,unsigned char bleu){
-    pic.pixels[y+x*pic.width].red = rouge;
-    pic.pixels[y+x*pic.width].green = vert;
-    pic.pixels[y+x*pic.width].blue = bleu;
+    pic.pixels[x+y*pic.width].red = rouge;
+    pic.pixels[x+y*pic.width].green = vert;
+    pic.pixels[x+y*pic.width].blue = bleu;
 }
 
 int main(){
