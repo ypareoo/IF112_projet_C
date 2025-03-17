@@ -184,14 +184,29 @@ int main(){
     jaune.green = 255;
     jaune.blue = 0;
     struct picture ma_photo = new_pic(500,500);
-    //read_picture(ma_photo,"kang.txt");
-    struct vector* liste = read_vector_file("cat.txt");
-    scale_vector(liste,0.5);
-    draw_vector(ma_photo,liste,jaune); // premier chat
-    //shift_vector(liste,250,0); // la rotation envoie le chat de l'autre côté
+    struct vector* liste = read_vector_file("kang.txt");
+    draw_vector(ma_photo,liste,jaune);
+    for (int truc = 0; truc<3; truc++){
+        shift_vector(liste,100,0);
+        draw_vector(ma_photo,liste,jaune);
+    }
+    shift_vector(liste,-300,200);
+    draw_vector(ma_photo,liste,jaune);
+    for (int truc = 0; truc<3; truc++){
+        shift_vector(liste,100,0);
+        draw_vector(ma_photo,liste,jaune);
+    }
+    shift_vector(liste,-400,-200);
     flip_vector(liste);
-    draw_vector(ma_photo,liste,jaune); // deuxième chat
-    save_picture(ma_photo,"image_vectorielle_chaine_cat.ppm");
+    shift_vector(liste,40,100);
+    draw_vector(ma_photo,liste,jaune);
+    for (int truc = 0; truc<3; truc++){
+        shift_vector(liste,100,0);
+        draw_vector(ma_photo,liste,jaune);
+    }
+
+
+    save_picture(ma_photo,"pavage_kang_chaine.ppm");
     free(ma_photo.pixels);
     printf("t:FIN\n");
 }
