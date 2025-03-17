@@ -136,12 +136,26 @@ struct vector* read_vector_file(char* nom_fichier){
 }
 
 void draw_vector(struct picture pic,struct vector* vecteur,struct color couleur){
+
+    //malloc à désallouer ??
     while (vecteur->next != NULL){
         trace_ligne(pic,vecteur->x1,vecteur->y1,vecteur->x2,vecteur->y2,couleur.red,couleur.green,couleur.blue);
         vecteur = vecteur->next;
         printf("t: on est ici \n");
     }
+}
 
+void scale_vector(struct vector* vecteur,double scale){
+
+    //malloc à désallouer ??
+    while (vecteur->next != NULL){
+        vecteur->x1 *= scale;
+        vecteur->y1 *= scale;
+        vecteur->x2 *= scale;
+        vecteur->y2 *= scale;
+        vecteur = vecteur->next;
+        printf("t: on est ici \n");
+    }
 }
 
 int main(){
@@ -151,9 +165,10 @@ int main(){
     jaune.blue = 0;
     struct picture ma_photo = new_pic(500,500);
     //read_picture(ma_photo,"kang.txt");
-    struct vector* liste = read_vector_file("kang.txt");
+    struct vector* liste = read_vector_file("cat.txt");
+    scale_vector(liste,0.5);
     draw_vector(ma_photo,liste,jaune);
-    save_picture(ma_photo,"image_vectorielle_chaine_kang.ppm");
+    save_picture(ma_photo,"image_vectorielle_chaine_cat.ppm");
     free(ma_photo.pixels);
     printf("t:FIN\n");
 }
