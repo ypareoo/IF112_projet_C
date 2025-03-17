@@ -70,18 +70,19 @@ void trace_ligne(struct picture pic,int x1,int y1,int x2,int y2,unsigned char ro
         pic.pixels[x+y*pic.width].blue = bleu;
         if (x1 - x2){
             if (x2 > x1){
-                x += 1;
+                x = x1 + roundf((float) ((float) (x2-x1+1)/n)*(i+1));
+                printf("t: x = %d\n",x);
             }
             else{
-                x-=1;
+                x = x1 - roundf((float) ((float) (x1-x2+1)/n)*(i+1));
             }
         }
         if (y1 - y2){
             if (y2 > y1){
-                y += 1;
+                y = y1 + roundf((float) ((float) (y2-y1+1)/n)*(i+1));
             }
             else{
-                y -= 1;
+                y = y1 - roundf((float) ((float) (y1-y2+1)/n)*(i+1));
             }
         }
         printf("t:i=%d\n",i);
@@ -96,6 +97,8 @@ int main(){
     trace_ligne(ma_photo,8,2,8,7,0,255,0);
     trace_ligne(ma_photo,2,1,7,1,255,0,255);
     trace_ligne(ma_photo,2,8,7,8,255,0,255);
+
+    //trace_ligne(ma_photo,9,0,2,1,255,255,255);
     //set_pixel(ma_photo,5,5,255,255,255);
     save_picture(ma_photo,"mon_image.ppm");
     free(ma_photo.pixels);
