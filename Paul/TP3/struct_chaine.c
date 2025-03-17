@@ -15,6 +15,14 @@ struct picture{
 
 };
 
+struct vector{
+    double x1;
+    double y1;
+    double x2;
+    double y2;
+    struct vector * next;
+};
+
 
 struct picture new_pic(int width, int height){
     struct picture retour;
@@ -94,22 +102,58 @@ void read_picture(struct picture pic,char* nom_fichier){
     FILE * fp = fopen(nom_fichier,"r");
     float x1,y1,x2,y2;
     while(fscanf(fp, "%f %f %f %f ",&x1,&y1,&x2,&y2) == 4){
-        printf("t: %f %f %f %f \n",x1,y1,x2,y2);
-        /*int xint1= roundf(x1); 
-        int yint1 = roundf(y1);   //trace_ligne s'occupe d'arrondir
+        //printf("t: %f %f %f %f \n",x1,y1,x2,y2);
+        /*int xint1= roundf(x1);
+        int yint1 = roundf(y1);
         int xint2 = roundf(x2);
         int yint2 = roundf(y2);*/
-        printf("t: %d %d %d %d \n",xint1,yint1,xint2,yint2);
+        //printf("t: %d %d %d %d \n",xint1,yint1,xint2,yint2);
         trace_ligne(pic,x1,y1,x2,y2,255,255,255);
     }
 
     fclose(fp);
 }
 
+struct vector* read_vector_file(char* nom_fichier){
+    struct vector * premier_elm = NULL;
+    struct vector * elm_en_cours = premier_elm;
+    FILE * fp = fopen(nom_fichier,"r");
+    float x1,y1,x2,y2;
+    while(fscanf(fp, "%f %f %f %f ",&x1,&y1,&x2,&y2) == 4){
+
+        struct vector* new_elm = (struct vector *) malloc(sizeof(struct vector));
+        new_elm->x1 = x1;
+        new_elm->y1 = y1;
+        new_elm->x2 = x2;
+        new_elm->y2 = y2;
+        new_elm->next = elm_en_cours;
+        elm_en_cours = new_elm;
+        printf("t: on est là \n");
+    }
+
+    fclose(fp);
+    return elm_en_cours;
+}
+
+void draw_vector(struct picture pic,struct vector* vecteur,struct color couleur){
+    while (vecteur->next != NULL){
+        trace_ligne(pic,vecteur->x1,vecteur->y1,vecteur->x2,vecteur->y2,couleur.red,couleur.green,couleur.blue);
+        vecteur = vecteur->next;
+        printf("t: on est ici \n");
+    }
+
+}
+
 int main(){
+    struct color jaune;
+    jaune.red = 255;
+    jaune.green = 255;
+    jaune.blue = 0;
     struct picture ma_photo = new_pic(500,500);
-    read_picture(ma_photo,"kang.txt");
-    save_picture(ma_photo,"image_vectorielle_kang.ppm");
+    //read_picture(ma_photo,"kang.txt");
+    struct vector* liste = read_vector_file("kang.txt");
+    draw_vector(ma_photo,liste,jaune);
+    save_picture(ma_photo,"image_vectorielle_chaine_kang.ppm");
     free(ma_photo.pixels);
     printf("t:FIN\n");
 }
